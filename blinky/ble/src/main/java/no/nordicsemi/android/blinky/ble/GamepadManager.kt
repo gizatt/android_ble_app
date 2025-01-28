@@ -13,10 +13,9 @@ import no.nordicsemi.android.ble.ktx.getCharacteristic
 import no.nordicsemi.android.ble.ktx.state.ConnectionState
 import no.nordicsemi.android.ble.ktx.stateAsFlow
 import no.nordicsemi.android.ble.ktx.suspend
-import no.nordicsemi.android.blinky.ble.data.ButtonCallback
-import no.nordicsemi.android.blinky.ble.data.ButtonState
-import no.nordicsemi.android.blinky.ble.data.LedCallback
-import no.nordicsemi.android.blinky.ble.data.LedData
+import no.nordicsemi.android.blinky.ble.data.GamepadInputData
+import no.nordicsemi.android.blinky.ble.data.GamepadOutputCallback
+import no.nordicsemi.android.blinky.ble.data.GamepadOutputState
 import no.nordicsemi.android.blinky.spec.Gamepad
 import no.nordicsemi.android.blinky.spec.GamepadSpec
 import timber.log.Timber
@@ -32,14 +31,11 @@ private class GamepadManagerImpl(
 ): BleManager(context), Gamepad {
     private val scope = CoroutineScope(Dispatchers.IO)
 
-    private var ledCharacteristic: BluetoothGattCharacteristic? = null
-    private var buttonCharacteristic: BluetoothGattCharacteristic? = null
+    private var gamepadInputCharacteristic: BluetoothGattCharacteristic? = null
+    private var gamepadOutputCharacteristic: BluetoothGattCharacteristic? = null
 
-    private val _ledState = MutableStateFlow(false)
-    override val ledState = _ledState.asStateFlow()
-
-    private val _buttonState = MutableStateFlow(false)
-    override val buttonState = _buttonState.asStateFlow()
+    private val _gamepadOutputState = MutableStateFlow(0.0)
+    override val t = _gamepadOutputState.asStateFlow()
 
     override val state = stateAsFlow()
         .map {
@@ -54,21 +50,14 @@ private class GamepadManagerImpl(
         .stateIn(scope, SharingStarted.Lazily, Gamepad.State.NOT_AVAILABLE)
 
 
-    private val buttonCallback by lazy {
-        object : ButtonCallback() {
-            override fun onButtonStateChanged(device: BluetoothDevice, state: Boolean) {
-                _buttonState.tryEmit(state)
+    private val gamepadOutputCallback by lazy {
+        object : GamepadOutputCallback() {
+            override fun onGamepadOutputStateChanged(device: BluetoothDevice, t: Double) {
+                _gamepadOutputState.tryEmit(t)
             }
         }
     }
 
-    private val ledCallback by lazy {
-        object : LedCallback() {
-            override fun onLedStateChanged(device: BluetoothDevice, state: Boolean) {
-                _ledState.tryEmit(state)
-            }
-        }
-    }
 
     override suspend fun connect() = connect(device)
         .retry(3, 300)
@@ -91,16 +80,13 @@ private class GamepadManagerImpl(
         }
     }
 
-    override suspend fun turnLed(state: Boolean) {
+    override suspend fun setGamepadState(enable: Boolean, leftJoystickX: Byte, leftJoystickY: Byte, rightJoystickX: Byte, rightJoystickY: Byte) {
         // Write the value to the characteristic.
         writeCharacteristic(
-            ledCharacteristic,
-            LedData.from(state),
+            gamepadInputCharacteristic,
+            GamepadInputData.from(enable, leftJoystickX, leftJoystickY, rightJoystickX, rightJoystickY),
             BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
         ).suspend()
-
-        // Update the state flow with the new value.
-        _ledState.value = state
     }
 
     override fun log(priority: Int, message: String) {
@@ -117,52 +103,48 @@ private class GamepadManagerImpl(
         // Get the LBS Service from the gatt object.
         gatt.getService(GamepadSpec.GAMEPAD_SERVICE_UUID)?.apply {
             // Get the LED characteristic.
-            ledCharacteristic = getCharacteristic(
+            gamepadOutputCharacteristic = getCharacteristic(
                 GamepadSpec.GAMEPAD_OUTPUT_CHARACTERISTIC_UUID,
                 // Mind, that below we pass required properties.
                 // If your implementation supports only WRITE_NO_RESPONSE,
                 // change the property to BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE.
-                BluetoothGattCharacteristic.PROPERTY_WRITE
+                BluetoothGattCharacteristic.PROPERTY_NOTIFY
             )
             // Get the Button characteristic.
-            buttonCharacteristic = getCharacteristic(
+            gamepadInputCharacteristic = getCharacteristic(
                 GamepadSpec.GAMEPAD_INPUT_CHARACTERISTIC_UUID,
-                BluetoothGattCharacteristic.PROPERTY_NOTIFY
+                BluetoothGattCharacteristic.PROPERTY_WRITE
             )
 
             // Return true if all required characteristics are supported.
-            return ledCharacteristic != null && buttonCharacteristic != null
+            return gamepadOutputCharacteristic != null && gamepadInputCharacteristic != null
         }
         return false
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun initialize() {
-        // Enable notifications for the button characteristic.
-        val flow: Flow<ButtonState> = setNotificationCallback(buttonCharacteristic)
+        // Enable notifications for the gamepad's output characteristic.
+        val flow: Flow<GamepadOutputState> = setNotificationCallback(gamepadOutputCharacteristic)
             .asValidResponseFlow()
 
-        // Forward the button state to the buttonState flow.
+        // Forward that state to its relevant flow.
         scope.launch {
-            flow.map { it.state }.collect { _buttonState.tryEmit(it) }
+            flow.map { it.t }.collect { _gamepadOutputState.tryEmit(it) }
         }
 
-        enableNotifications(buttonCharacteristic)
+        enableNotifications(gamepadOutputCharacteristic)
             .enqueue()
 
-        // Read the initial value of the button characteristic.
-        readCharacteristic(buttonCharacteristic)
-            .with(buttonCallback)
-            .enqueue()
 
         // Read the initial value of the LED characteristic.
-        readCharacteristic(ledCharacteristic)
-            .with(ledCallback)
+        readCharacteristic(gamepadOutputCharacteristic)
+            .with(gamepadOutputCallback)
             .enqueue()
     }
 
     override fun onServicesInvalidated() {
-        ledCharacteristic = null
-        buttonCharacteristic = null
+        gamepadInputCharacteristic = null
+        gamepadOutputCharacteristic = null
     }
 }

@@ -21,24 +21,17 @@ interface Gamepad {
     fun release()
 
     /**
-     * The current state of the blinky.
+     * The current state of the connection.
      */
     val state: StateFlow<State>
 
     /**
-     * The current state of the LED.
+     * Current time on device.
      */
-    val ledState: StateFlow<Boolean>
+    val t: StateFlow<Double>
 
     /**
-     * The current state of the button.
+     * Set gamepad state.
      */
-    val buttonState: StateFlow<Boolean>
-
-    /**
-     * Controls the LED state.
-     *
-     * @param state the new state of the LED.
-     */
-    suspend fun turnLed(state: Boolean)
+    suspend fun setGamepadState(enable: Boolean, leftJoystickX: Byte, leftJoystickY: Byte, rightJoystickX: Byte, rightJoystickY: Byte)
 }
