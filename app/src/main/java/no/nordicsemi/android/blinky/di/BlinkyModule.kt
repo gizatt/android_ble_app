@@ -10,9 +10,9 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ViewModelScoped
-import no.nordicsemi.android.blinky.ble.BlinkyManager
+import no.nordicsemi.android.blinky.ble.GamepadManager
 import no.nordicsemi.android.blinky.ui.control.Blinky
-import no.nordicsemi.android.blinky.spec.Blinky
+import no.nordicsemi.android.blinky.spec.Gamepad
 import no.nordicsemi.android.blinky.spec.R
 import no.nordicsemi.android.common.navigation.get
 import javax.inject.Named
@@ -52,13 +52,13 @@ abstract class BlinkyModule {
         fun provideBlinkyManager(
             @ApplicationContext context: Context,
             device: BluetoothDevice,
-        ) = BlinkyManager(context, device)
+        ) = GamepadManager(context, device)
 
     }
 
     @Binds
     abstract fun bindBlinky(
-        blinkyManager: BlinkyManager
-    ): Blinky
+        blinkyManager: GamepadManager
+    ): Gamepad
 
 }

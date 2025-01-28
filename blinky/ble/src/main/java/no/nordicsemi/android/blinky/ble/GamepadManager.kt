@@ -17,19 +17,19 @@ import no.nordicsemi.android.blinky.ble.data.ButtonCallback
 import no.nordicsemi.android.blinky.ble.data.ButtonState
 import no.nordicsemi.android.blinky.ble.data.LedCallback
 import no.nordicsemi.android.blinky.ble.data.LedData
-import no.nordicsemi.android.blinky.spec.Blinky
-import no.nordicsemi.android.blinky.spec.BlinkySpec
+import no.nordicsemi.android.blinky.spec.Gamepad
+import no.nordicsemi.android.blinky.spec.GamepadSpec
 import timber.log.Timber
 
-class BlinkyManager(
+class GamepadManager(
     context: Context,
     device: BluetoothDevice
-): Blinky by BlinkyManagerImpl(context, device)
+): Gamepad by GamepadManagerImpl(context, device)
 
-private class BlinkyManagerImpl(
+private class GamepadManagerImpl(
     context: Context,
     private val device: BluetoothDevice,
-): BleManager(context), Blinky {
+): BleManager(context), Gamepad {
     private val scope = CoroutineScope(Dispatchers.IO)
 
     private var ledCharacteristic: BluetoothGattCharacteristic? = null
@@ -45,13 +45,13 @@ private class BlinkyManagerImpl(
         .map {
             when (it) {
                 is ConnectionState.Connecting,
-                is ConnectionState.Initializing -> Blinky.State.LOADING
-                is ConnectionState.Ready -> Blinky.State.READY
+                is ConnectionState.Initializing -> Gamepad.State.LOADING
+                is ConnectionState.Ready -> Gamepad.State.READY
                 is ConnectionState.Disconnecting,
-                is ConnectionState.Disconnected -> Blinky.State.NOT_AVAILABLE
+                is ConnectionState.Disconnected -> Gamepad.State.NOT_AVAILABLE
             }
         }
-        .stateIn(scope, SharingStarted.Lazily, Blinky.State.NOT_AVAILABLE)
+        .stateIn(scope, SharingStarted.Lazily, Gamepad.State.NOT_AVAILABLE)
 
 
     private val buttonCallback by lazy {
@@ -115,10 +115,10 @@ private class BlinkyManagerImpl(
 
     override fun isRequiredServiceSupported(gatt: BluetoothGatt): Boolean {
         // Get the LBS Service from the gatt object.
-        gatt.getService(BlinkySpec.BLINKY_SERVICE_UUID)?.apply {
+        gatt.getService(GamepadSpec.GAMEPAD_SERVICE_UUID)?.apply {
             // Get the LED characteristic.
             ledCharacteristic = getCharacteristic(
-                BlinkySpec.BLINKY_LED_CHARACTERISTIC_UUID,
+                GamepadSpec.GAMEPAD_OUTPUT_CHARACTERISTIC_UUID,
                 // Mind, that below we pass required properties.
                 // If your implementation supports only WRITE_NO_RESPONSE,
                 // change the property to BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE.
@@ -126,7 +126,7 @@ private class BlinkyManagerImpl(
             )
             // Get the Button characteristic.
             buttonCharacteristic = getCharacteristic(
-                BlinkySpec.BLINKY_BUTTON_CHARACTERISTIC_UUID,
+                GamepadSpec.GAMEPAD_INPUT_CHARACTERISTIC_UUID,
                 BluetoothGattCharacteristic.PROPERTY_NOTIFY
             )
 

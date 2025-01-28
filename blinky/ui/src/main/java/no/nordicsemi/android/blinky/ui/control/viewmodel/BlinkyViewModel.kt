@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import no.nordicsemi.android.blinky.ui.control.repository.BlinkyRepository
+import no.nordicsemi.android.blinky.ui.control.repository.GamepadRepository
 import no.nordicsemi.android.common.logger.LoggerLauncher
 import timber.log.Timber
 import javax.inject.Inject
@@ -29,7 +29,7 @@ import javax.inject.Named
 @HiltViewModel
 class BlinkyViewModel @Inject constructor(
     @ApplicationContext context: Context,
-    private val repository: BlinkyRepository,
+    private val repository: GamepadRepository,
     @Named("deviceName") val deviceName: String,
 ) : AndroidViewModel(context as Application) {
     /** The connection state of the device. */

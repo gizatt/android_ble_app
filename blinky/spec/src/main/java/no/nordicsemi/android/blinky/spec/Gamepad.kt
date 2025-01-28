@@ -2,7 +2,7 @@ package no.nordicsemi.android.blinky.spec
 
 import kotlinx.coroutines.flow.StateFlow
 
-interface Blinky {
+interface Gamepad {
 
     enum class State {
         LOADING,

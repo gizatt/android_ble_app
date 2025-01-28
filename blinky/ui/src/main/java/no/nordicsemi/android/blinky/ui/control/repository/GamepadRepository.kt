@@ -4,7 +4,7 @@ import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.onEach
-import no.nordicsemi.android.blinky.spec.Blinky
+import no.nordicsemi.android.blinky.spec.Gamepad
 import no.nordicsemi.android.log.ILogSession
 import no.nordicsemi.android.log.LogContract
 import no.nordicsemi.android.log.timber.nRFLoggerTree
@@ -17,14 +17,14 @@ import javax.inject.Named
  * @param context The application context.
  * @param deviceId The device ID.
  * @param deviceName The name of the Blinky device, as advertised.
- * @property blinky The Blinky implementation.
+ * @property gamepad The Blinky implementation.
  */
-class BlinkyRepository @Inject constructor(
+class GamepadRepository @Inject constructor(
     @ApplicationContext context: Context,
     @Named("deviceId") deviceId: String,
     @Named("deviceName") deviceName: String,
-    private val blinky: Blinky,
-): Blinky by blinky {
+    private val gamepad: Gamepad,
+): Gamepad by gamepad {
     /** Timber tree that logs to nRF Logger. */
     private val tree: Timber.Tree
 
@@ -39,7 +39,7 @@ class BlinkyRepository @Inject constructor(
     }
 
     val loggedLedState: Flow<Boolean>
-        get() = blinky.ledState.onEach {
+        get() = gamepad.ledState.onEach {
             // Although Timber log levels are the same as LogCat's, nRF Logger has its own.
             // All standard log levels are mapped to the corresponding nRF Logger's levels:
             // https://github.com/NordicSemiconductor/nRF-Logger-API/blob/f90d5834c46cc2057b6a9f39dcbb8f2f2dd45d56/log-timber/src/main/java/no/nordicsemi/android/log/timber/nRFLoggerTree.java#L104
@@ -52,7 +52,7 @@ class BlinkyRepository @Inject constructor(
         }
 
     val loggedButtonState: Flow<Boolean>
-        get() = blinky.buttonState.onEach {
+        get() = gamepad.buttonState.onEach {
             // The same applies here.
             when(it) {
                 true -> Timber.log(LogContract.Log.Level.APPLICATION, "Button pressed")
@@ -62,6 +62,6 @@ class BlinkyRepository @Inject constructor(
 
     override fun release() {
         Timber.uproot(tree)
-        blinky.release()
+        gamepad.release()
     }
 }

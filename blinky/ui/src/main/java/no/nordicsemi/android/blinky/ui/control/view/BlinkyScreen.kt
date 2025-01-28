@@ -16,7 +16,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import no.nordicsemi.android.blinky.spec.Blinky
+import no.nordicsemi.android.blinky.spec.Gamepad
 import no.nordicsemi.android.blinky.ui.R
 import no.nordicsemi.android.blinky.ui.control.viewmodel.BlinkyViewModel
 import no.nordicsemi.android.common.logger.view.LoggerAppBarIcon
@@ -46,7 +46,7 @@ internal fun BlinkyScreen(
         )
         RequireBluetooth {
             when (state) {
-                Blinky.State.LOADING -> {
+                Gamepad.State.LOADING -> {
                     DeviceConnectingView(
                         modifier = Modifier.padding(16.dp),
                     ) { padding ->
@@ -58,7 +58,7 @@ internal fun BlinkyScreen(
                         }
                     }
                 }
-                Blinky.State.READY -> {
+                Gamepad.State.READY -> {
                     val ledState by viewModel.ledState.collectAsStateWithLifecycle()
                     val buttonState by viewModel.buttonState.collectAsStateWithLifecycle()
 
@@ -72,7 +72,7 @@ internal fun BlinkyScreen(
                             .padding(16.dp)
                     )
                 }
-                Blinky.State.NOT_AVAILABLE -> {
+                Gamepad.State.NOT_AVAILABLE -> {
                     DeviceDisconnectedView(
                         reason = Reason.LINK_LOSS,
                         modifier = Modifier.padding(16.dp),
