@@ -3,13 +3,7 @@
     <string name="action_cancel">Cancel</string>
     <string name="action_retry">Retry</string>
 
-    <string name="blinky_led">LED</string>
-    <string name="blinky_led_descr">Switch to toggle the LED</string>
-
-    <string name="blinky_button">Button</string>
     <string name="gamepad_state_descr">Current time </string>
-    <string name="blinky_on">ON</string>
-    <string name="blinky_off">OFF</string>
 
-    <string name="scanner_title">nRF Blinky</string>
+    <string name="scanner_title">Gamepad Client</string>
 </resources>

@@ -7,6 +7,10 @@ plugins {
 
 android {
     namespace = "no.nordicsemi.android.blinky.ui"
+
+    defaultConfig {
+        minSdk = 24
+    }
 }
 
 dependencies {

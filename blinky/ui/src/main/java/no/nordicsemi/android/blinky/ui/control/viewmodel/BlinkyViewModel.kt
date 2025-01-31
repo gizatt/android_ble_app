@@ -35,8 +35,8 @@ class BlinkyViewModel @Inject constructor(
     /** The connection state of the device. */
     val state = repository.state
     /** The button state. */
-    val gamepadOutputState = repository.loggedGamepadOutputState
-        .stateIn(viewModelScope, SharingStarted.Lazily, false)
+    val t = repository.loggedGamepadOutputState
+        .stateIn(viewModelScope, SharingStarted.Lazily, 0.0)
 
     init {
         // In this sample we want to connect to the device as soon as the view model is created.

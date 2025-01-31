@@ -11,30 +11,26 @@ import androidx.compose.ui.unit.dp
 @Composable
 internal fun BlinkyControlView(
     t: Double,
-    // onStateChanged: (Boolean) -> Unit,
+    setGamepadState: (Boolean, Byte, Byte, Byte, Byte) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-//        LedControlView(
-//            state = ledState,
-//            onStateChanged = onStateChanged,
-//        )
-
+        GamepadView(setGamepadState = setGamepadState)
         GamepadOutputStateView(
             t = t
         )
     }
 }
 
-@Preview
+@Preview(widthDp = 700, heightDp = 400)
 @Composable
 private fun BlinkyControlViewPreview() {
     BlinkyControlView(
         t = 1.23,
-        // onStateChanged = {},
+        setGamepadState = ::stubSetGamepadState,
         modifier = Modifier.padding(16.dp),
     )
 }
