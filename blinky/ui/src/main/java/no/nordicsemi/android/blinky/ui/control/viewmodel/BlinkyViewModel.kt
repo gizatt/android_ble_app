@@ -34,24 +34,8 @@ class BlinkyViewModel @Inject constructor(
 ) : AndroidViewModel(context as Application) {
     /** The connection state of the device. */
     val state = repository.state
-    /** The LED state. */
-    val ledState = repository.loggedLedState
-        .stateIn(viewModelScope, SharingStarted.Lazily, false)
     /** The button state. */
-    val buttonState = repository.loggedButtonState
-        .onEach { state ->
-            // Play a sound when the button is pressed.
-            try {
-                if (state) {
-                    val notification =
-                        RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-                    val r = RingtoneManager.getRingtone(context, notification)
-                    r.play()
-                }
-            } catch (e: Exception) {
-                Timber.e("Failed to play notification sound")
-            }
-        }
+    val gamepadOutputState = repository.loggedGamepadOutputState
         .stateIn(viewModelScope, SharingStarted.Lazily, false)
 
     init {
@@ -73,15 +57,14 @@ class BlinkyViewModel @Inject constructor(
     }
 
     /**
-     * Sends a command to the device to toggle the LED state.
-     * @param on The new state of the LED.
+     * Sends a command to the device.
      */
-    fun turnLed(on: Boolean) {
+    fun setGamepadState(enable: Boolean, leftJoystickX: Byte, leftJoystickY: Byte, rightJoystickX: Byte, rightJoystickY: Byte) {
         val exceptionHandler = CoroutineExceptionHandler { _, _ -> }
         viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
             // Just like above, when this method throws an exception, it will be caught by the
             // exception handler and ignored.
-            repository.turnLed(on)
+            repository.setGamepadState(enable, leftJoystickX, leftJoystickY, rightJoystickX, rightJoystickY)
         }
     }
 

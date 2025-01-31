@@ -59,18 +59,18 @@ internal fun BlinkyScreen(
                     }
                 }
                 Gamepad.State.READY -> {
-                    val ledState by viewModel.ledState.collectAsStateWithLifecycle()
-                    val buttonState by viewModel.buttonState.collectAsStateWithLifecycle()
+//                    val ledState by viewModel.t.collectAsStateWithLifecycle()
+//                    val buttonState by viewModel.buttonState.collectAsStateWithLifecycle()
 
-                    BlinkyControlView(
-                        ledState = ledState,
-                        buttonState = buttonState,
-                        onStateChanged = { viewModel.turnLed(it) },
-                        modifier = Modifier
-                            .widthIn(max = 460.dp)
-                            .verticalScroll(rememberScrollState())
-                            .padding(16.dp)
-                    )
+//                    BlinkyControlView(
+//                        ledState = ledState,
+//                        buttonState = buttonState,
+//                        onStateChanged = { viewModel.turnLed(it) },
+//                        modifier = Modifier
+//                            .widthIn(max = 460.dp)
+//                            .verticalScroll(rememberScrollState())
+//                            .padding(16.dp)
+//                    )
                 }
                 Gamepad.State.NOT_AVAILABLE -> {
                     DeviceDisconnectedView(
