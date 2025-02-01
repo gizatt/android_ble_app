@@ -108,7 +108,7 @@ private class GamepadManagerImpl(
                 // Mind, that below we pass required properties.
                 // If your implementation supports only WRITE_NO_RESPONSE,
                 // change the property to BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE.
-                BluetoothGattCharacteristic.PROPERTY_NOTIFY
+                BluetoothGattCharacteristic.PROPERTY_READ
             )
             // Get the Button characteristic.
             gamepadInputCharacteristic = getCharacteristic(
