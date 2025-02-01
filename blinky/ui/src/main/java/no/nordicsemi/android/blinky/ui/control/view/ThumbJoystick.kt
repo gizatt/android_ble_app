@@ -6,6 +6,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -30,15 +31,15 @@ fun ThumbJoystick(
     modifier: Modifier = Modifier
 ) {
     var center by remember { mutableStateOf(Offset.Zero) }
-    var currentPosition by remember { mutableStateOf(Offset.Zero) }
+    var currentOffset by remember { mutableStateOf(Offset.Zero) }
     var isDragging by remember { mutableStateOf(false) }
 
     val animatedX by animateFloatAsState(
-        targetValue = if (isDragging) currentPosition.x else center.x,
+        targetValue = currentOffset.x,
         label="animatedX"
     )
     val animatedY by animateFloatAsState(
-        targetValue = if (isDragging) currentPosition.y else center.y,
+        targetValue = currentOffset.y,
         label="animatedY"
     )
 
@@ -50,46 +51,43 @@ fun ThumbJoystick(
                         isDragging = true
                     },
                     onDrag = { change, _ ->
-                        currentPosition = change.position
-                        val radius = size.width / 2f
-                        val delta = currentPosition - center
-                        val distance = delta.getDistance()
+                        val radius = intArrayOf(size.width, size.height).min() / 2f
+                        currentOffset = change.position - center
+                        val distance = currentOffset.getDistance()
                         if (distance > radius) {
-                            val angle = atan2(delta.y, delta.x)
-                            currentPosition = Offset(
-                                (radius + radius * cos(angle)),
-                                (radius + radius * sin(angle))
-                            )
+                            currentOffset = currentOffset.times(radius / distance)
                         }
-                        val normalizedX = (currentPosition.x / size.width)
-                        val normalizedY = (currentPosition.y / size.height)
-                        onPositionChange(normalizedX, normalizedY)
+                        onPositionChange(currentOffset.x/radius, currentOffset.y/radius)
                     },
                     onDragEnd = {
                         isDragging = false
-                        val normalizedX = (center.x / size.width)
-                        val normalizedY = (center.y / size.height)
-                        onPositionChange(normalizedX, normalizedY)
+                        currentOffset = Offset.Zero
+                        onPositionChange(0.0F, 0.0F)
                     },
                     onDragCancel = {
                         isDragging = false
                     }
                 )
             }
-            .background(Color.LightGray)
     ) {
-        Canvas(modifier = Modifier.fillMaxSize()) {
+        Canvas(modifier = Modifier.aspectRatio(1f)) {
             center = Offset(size.width / 2, size.height / 2)
             drawCircle(
-                color = Color.hsv(24.0F, 0.6F, 0.8F),
+                color = Color(0xFFFFD700),
                 radius = size.width / 2f,
-                center = center
+                center = center + Offset(animatedX, animatedY)
             )
             drawCircle(
-                color = Color.hsv(240.0F, 0.1F, 0.1F),
-                radius = size.width / 4f,
-                center = Offset(animatedX, animatedY)
+                color = Color(0xFF000000),
+                radius = size.width / 2f - 10,
+                center = center + Offset(animatedX, animatedY)
             )
+            drawCircle(
+                color = Color(0xFFFFFFFF),
+                radius = size.width / 8f,
+                center = center * 0.5F + Offset(animatedX, animatedY)
+            )
+
         }
     }
 }

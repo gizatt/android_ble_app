@@ -37,6 +37,8 @@ private class GamepadManagerImpl(
     private val _gamepadOutputState = MutableStateFlow(0.0)
     override val t = _gamepadOutputState.asStateFlow()
 
+    private val _gamepadInputState = MutableStateFlow(GamepadInputData.from(false, 0, 0, 0, 0))
+
     override val state = stateAsFlow()
         .map {
             when (it) {
@@ -82,11 +84,7 @@ private class GamepadManagerImpl(
 
     override suspend fun setGamepadState(enable: Boolean, leftJoystickX: Byte, leftJoystickY: Byte, rightJoystickX: Byte, rightJoystickY: Byte) {
         // Write the value to the characteristic.
-        writeCharacteristic(
-            gamepadInputCharacteristic,
-            GamepadInputData.from(enable, leftJoystickX, leftJoystickY, rightJoystickX, rightJoystickY),
-            BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
-        ).suspend()
+        _gamepadInputState.value = GamepadInputData.from(enable, leftJoystickX, leftJoystickY, rightJoystickX, rightJoystickY)
     }
 
     override fun log(priority: Int, message: String) {
@@ -108,7 +106,7 @@ private class GamepadManagerImpl(
                 // Mind, that below we pass required properties.
                 // If your implementation supports only WRITE_NO_RESPONSE,
                 // change the property to BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE.
-                BluetoothGattCharacteristic.PROPERTY_READ
+                BluetoothGattCharacteristic.PROPERTY_NOTIFY
             )
             // Get the Button characteristic.
             gamepadInputCharacteristic = getCharacteristic(
@@ -133,14 +131,22 @@ private class GamepadManagerImpl(
             flow.map { it.t }.collect { _gamepadOutputState.tryEmit(it) }
         }
 
-        enableNotifications(gamepadOutputCharacteristic)
-            .enqueue()
-
-
-        // Read the initial value of the LED characteristic.
-        readCharacteristic(gamepadOutputCharacteristic)
-            .with(gamepadOutputCallback)
-            .enqueue()
+        scope.launch {
+            while (true) {
+                writeCharacteristic(
+                    gamepadInputCharacteristic,
+                    _gamepadInputState.value,
+                    BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
+                ).await()
+                // Read the initial value of the LED characteristic.
+                // Shouldn't be necessary because of notify but this is working for now.
+                readCharacteristic(gamepadOutputCharacteristic)
+                    .with(gamepadOutputCallback)
+                    .await()
+                // Alas any faster and things lag
+                delay(100)
+            }
+        }
     }
 
     override fun onServicesInvalidated() {

@@ -78,8 +78,6 @@ internal fun BlinkyScreen(
                         t = t,
                         setGamepadState = viewModel::setGamepadState,
                         modifier = Modifier
-                            .widthIn(max = 460.dp)
-                            .verticalScroll(rememberScrollState())
                             .padding(16.dp)
                     )
                 }

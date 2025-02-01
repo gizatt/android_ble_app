@@ -39,10 +39,10 @@ internal fun GamepadView(
     fun sendGamepadState() {
         setGamepadState(
             isEnabled,
-            (joystick1X*127+128).toInt().toByte(),
-            (joystick1Y*127+128).toInt().toByte(),
-            (joystick2X*127+128).toInt().toByte(),
-            (joystick2Y*127+128).toInt().toByte()
+            (joystick1X*127).toInt().toByte(),
+            (joystick1Y*127).toInt().toByte(),
+            (joystick2X*127).toInt().toByte(),
+            (joystick2Y*127).toInt().toByte()
         )
     }
 
