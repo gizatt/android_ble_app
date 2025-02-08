@@ -56,10 +56,15 @@ fun ThumbJoystick(
                     },
                     onDrag = { change, _ ->
                         val radius = intArrayOf(size.width, size.height).min() / 2f
+                        val deadzone = intArrayOf(size.width, size.height).min() / 10f
                         currentOffset = change.position - center
                         val distance = currentOffset.getDistance()
-                        if (distance > radius) {
+                        if (distance < deadzone)
+                            currentOffset = Offset.Zero
+                        else if (distance > radius) {
                             currentOffset = currentOffset.times(radius / distance)
+                        } else {
+                            currentOffset = currentOffset.times( (distance - deadzone) / (radius - deadzone))
                         }
                         onPositionChange(currentOffset.x/radius, currentOffset.y/radius)
                     },
@@ -74,12 +79,6 @@ fun ThumbJoystick(
                 )
             }
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.eye_star),
-            contentDescription = "Joystick center marker",
-            modifier = Modifier.fillMaxSize()
-        )
-
         Canvas(modifier = Modifier.aspectRatio(1f)) {
             center = Offset(size.width / 2, size.height / 2)
             drawCircle(

@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -115,8 +117,8 @@ internal fun GamepadView(
 
         // Joysticks
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly,
+            modifier = Modifier.fillMaxWidth().fillMaxHeight(),
+            horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.Bottom
         ) {
             ThumbJoystick(
@@ -125,7 +127,7 @@ internal fun GamepadView(
                     joystick1Y = y
                     sendGamepadState()
                 },
-                modifier = Modifier.size(150.dp)
+                modifier = Modifier.fillMaxHeight()
             )
             ThumbJoystick(
                 onPositionChange = { x, y ->
@@ -133,7 +135,7 @@ internal fun GamepadView(
                     joystick2Y = y
                     sendGamepadState()
                 },
-                modifier = Modifier.size(150.dp)
+                modifier = Modifier.fillMaxHeight()
             )
         }
         Spacer(modifier = Modifier.height(16.dp))
