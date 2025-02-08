@@ -23,11 +23,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.height
+import no.nordicsemi.android.blinky.spec.Gamepad
 import no.nordicsemi.android.blinky.spec.GamepadInput
+import no.nordicsemi.android.blinky.ui.control.viewmodel.GamepadUIOutput
+
 
 @Composable
 internal fun GamepadView(
-    setGamepadState: (GamepadInput) -> Unit,
+    setGamepadState: (GamepadUIOutput) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var isEnabled by remember { mutableStateOf(false) }
@@ -36,17 +39,15 @@ internal fun GamepadView(
     var joystick1Y by remember { mutableFloatStateOf(0f) }
     var joystick2X by remember { mutableFloatStateOf(0f) }
     var joystick2Y by remember { mutableFloatStateOf(0f) }
+    var height by remember { mutableFloatStateOf(-1.0f) }
+    var motionEnable by remember { mutableStateOf(false) }
 
     // Centralized function to send the gamepad state
     fun sendGamepadState() {
         setGamepadState(
-            GamepadInput(
-            isEnabled,
-            (speed*255).toInt().toUByte(),
-            (joystick1X*127).toInt().toByte(),
-            (joystick1Y*127).toInt().toByte(),
-            (joystick2X*127).toInt().toByte(),
-            (joystick2Y*127).toInt().toByte()
+            GamepadUIOutput(
+            isEnabled,speed, joystick1X, joystick1Y, joystick2X, joystick2Y,
+                height, motionEnable,
             )
         )
     }
@@ -80,7 +81,36 @@ internal fun GamepadView(
                 steps=100,
                 onValueChangeFinished = {
                     sendGamepadState()
-                },)
+                })
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(text = "Motion control:", fontSize = 18.sp)
+            Spacer(modifier = Modifier.width(16.dp))
+            Switch(
+                checked = motionEnable,
+                onCheckedChange = {
+                    motionEnable = it
+                    sendGamepadState()
+                }
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Text(text = "Height: %.02f".format(height), fontSize= 18.sp)
+            Spacer(modifier = Modifier.width(4.dp))
+            Slider(
+                value = height,
+                onValueChange = {
+                    height = it
+                    sendGamepadState()
+                                },
+                valueRange = -1f..1f,
+                steps=100,
+                onValueChangeFinished = {
+                    sendGamepadState()
+                })
         }
 
         // Joysticks
@@ -112,7 +142,7 @@ internal fun GamepadView(
 
 
 // Stub implementation as a named function
-fun stubSetGamepadState(input: GamepadInput) {
+fun stubSetGamepadState(input: GamepadUIOutput) {
     println(
         "Gamepad state changed: $input"
     )

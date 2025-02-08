@@ -38,7 +38,7 @@ private class GamepadManagerImpl(
     private val _gamepadOutputState = MutableStateFlow(0.0)
     override val t = _gamepadOutputState.asStateFlow()
 
-    private val _gamepadInputState = MutableStateFlow(GamepadInputData.from(GamepadInput(false, 0u, 0, 0, 0, 0)))
+    private val _gamepadInputState = MutableStateFlow(GamepadInputData.from(GamepadInput(false, 0u, 0, 0, 0, 0, 0, 0, -1)))
 
     override val state = stateAsFlow()
         .map {
@@ -145,7 +145,7 @@ private class GamepadManagerImpl(
                     .with(gamepadOutputCallback)
                     .await()
                 // Alas any faster and things lag
-                delay(100)
+                // delay(50)
             }
         }
     }
