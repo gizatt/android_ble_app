@@ -1,17 +1,19 @@
 package no.nordicsemi.android.blinky.ble.data
 
 import no.nordicsemi.android.ble.data.Data
+import no.nordicsemi.android.blinky.spec.GamepadInput
 
 class GamepadInputData private constructor() {
 
     companion object {
-        fun from(enable: Boolean, leftJoystickX: Byte, leftJoystickY: Byte, rightJoystickX: Byte, rightJoystickY: Byte): Data {
-            val buffer = ByteArray(5)
-            buffer[0] = if (enable) 0x01 else 0x00
-            buffer[1] = leftJoystickX
-            buffer[2] = leftJoystickY
-            buffer[3] = rightJoystickX
-            buffer[4] = rightJoystickY
+        fun from(data: GamepadInput): Data {
+            val buffer = ByteArray(6)
+            buffer[0] = if (data.enable) 0x01 else 0x00
+            buffer[1] = data.speed.toByte()
+            buffer[2] = data.leftJoystickX
+            buffer[3] = data.leftJoystickY
+            buffer[4] = data.rightJoystickX
+            buffer[5] = data.rightJoystickY
             return Data(buffer)
         }
     }

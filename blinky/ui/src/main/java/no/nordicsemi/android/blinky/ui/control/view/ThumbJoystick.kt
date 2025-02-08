@@ -3,11 +3,13 @@ package no.nordicsemi.android.blinky.ui.control.view
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
@@ -19,8 +21,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import no.nordicsemi.android.blinky.ui.R
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
@@ -70,6 +74,12 @@ fun ThumbJoystick(
                 )
             }
     ) {
+        Image(
+            painter = painterResource(id = R.drawable.eye_star),
+            contentDescription = "Joystick center marker",
+            modifier = Modifier.fillMaxSize()
+        )
+
         Canvas(modifier = Modifier.aspectRatio(1f)) {
             center = Offset(size.width / 2, size.height / 2)
             drawCircle(
@@ -99,6 +109,8 @@ private fun ThumbJoystickPreview() {
         onPositionChange = { x, y ->
             println("Position changed: x=$x, y=$y")
         },
-        modifier = Modifier.size(256.dp, 256.dp).padding(16.dp),
+        modifier = Modifier
+            .size(256.dp, 256.dp)
+            .padding(16.dp),
     )
 }

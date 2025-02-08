@@ -23,13 +23,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.height
+import no.nordicsemi.android.blinky.spec.GamepadInput
 
 @Composable
 internal fun GamepadView(
-    setGamepadState: (Boolean, Byte, Byte, Byte, Byte) -> Unit,
+    setGamepadState: (GamepadInput) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var isEnabled by remember { mutableStateOf(false) }
+    var speed by remember { mutableFloatStateOf(0.25f) }
     var joystick1X by remember { mutableFloatStateOf(0f) }
     var joystick1Y by remember { mutableFloatStateOf(0f) }
     var joystick2X by remember { mutableFloatStateOf(0f) }
@@ -38,11 +40,14 @@ internal fun GamepadView(
     // Centralized function to send the gamepad state
     fun sendGamepadState() {
         setGamepadState(
+            GamepadInput(
             isEnabled,
+            (speed*255).toInt().toUByte(),
             (joystick1X*127).toInt().toByte(),
             (joystick1Y*127).toInt().toByte(),
             (joystick2X*127).toInt().toByte(),
             (joystick2Y*127).toInt().toByte()
+            )
         )
     }
 
@@ -56,15 +61,26 @@ internal fun GamepadView(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
-            Text(text = "ENABLE:", fontSize = 18.sp)
+            Text(text = "Enable:", fontSize = 18.sp)
             Spacer(modifier = Modifier.width(16.dp))
             Switch(
                 checked = isEnabled,
                 onCheckedChange = {
                     isEnabled = it
-                    sendGamepadState() // Call the centralized function
+                    sendGamepadState()
                 }
             )
+            Spacer(modifier = Modifier.width(16.dp))
+            Text(text = "Speed: %.02f".format(speed), fontSize= 18.sp)
+            Spacer(modifier = Modifier.width(4.dp))
+            Slider(
+                value = speed,
+                onValueChange = { speed = it },
+                valueRange = 0f..1f,
+                steps=100,
+                onValueChangeFinished = {
+                    sendGamepadState()
+                },)
         }
 
         // Joysticks
@@ -96,14 +112,9 @@ internal fun GamepadView(
 
 
 // Stub implementation as a named function
-fun stubSetGamepadState(isEnabled: Boolean, byte1: Byte, byte2: Byte, byte3: Byte, byte4: Byte) {
+fun stubSetGamepadState(input: GamepadInput) {
     println(
-        "Gamepad state changed: " +
-                "isEnabled=$isEnabled, " +
-                "byte1=$byte1, " +
-                "byte2=$byte2, " +
-                "byte3=$byte3, " +
-                "byte4=$byte4"
+        "Gamepad state changed: $input"
     )
 }
 

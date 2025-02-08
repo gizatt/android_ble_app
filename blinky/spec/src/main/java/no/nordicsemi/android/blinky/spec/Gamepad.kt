@@ -2,6 +2,7 @@ package no.nordicsemi.android.blinky.spec
 
 import kotlinx.coroutines.flow.StateFlow
 
+
 interface Gamepad {
 
     enum class State {
@@ -33,5 +34,5 @@ interface Gamepad {
     /**
      * Set gamepad state.
      */
-    suspend fun setGamepadState(enable: Boolean, leftJoystickX: Byte, leftJoystickY: Byte, rightJoystickX: Byte, rightJoystickY: Byte)
+    suspend fun setGamepadState(input: GamepadInput)
 }

@@ -17,6 +17,7 @@ import no.nordicsemi.android.blinky.ble.data.GamepadInputData
 import no.nordicsemi.android.blinky.ble.data.GamepadOutputCallback
 import no.nordicsemi.android.blinky.ble.data.GamepadOutputState
 import no.nordicsemi.android.blinky.spec.Gamepad
+import no.nordicsemi.android.blinky.spec.GamepadInput
 import no.nordicsemi.android.blinky.spec.GamepadSpec
 import timber.log.Timber
 
@@ -37,7 +38,7 @@ private class GamepadManagerImpl(
     private val _gamepadOutputState = MutableStateFlow(0.0)
     override val t = _gamepadOutputState.asStateFlow()
 
-    private val _gamepadInputState = MutableStateFlow(GamepadInputData.from(false, 0, 0, 0, 0))
+    private val _gamepadInputState = MutableStateFlow(GamepadInputData.from(GamepadInput(false, 0u, 0, 0, 0, 0)))
 
     override val state = stateAsFlow()
         .map {
@@ -82,9 +83,9 @@ private class GamepadManagerImpl(
         }
     }
 
-    override suspend fun setGamepadState(enable: Boolean, leftJoystickX: Byte, leftJoystickY: Byte, rightJoystickX: Byte, rightJoystickY: Byte) {
+    override suspend fun setGamepadState(input: GamepadInput) {
         // Write the value to the characteristic.
-        _gamepadInputState.value = GamepadInputData.from(enable, leftJoystickX, leftJoystickY, rightJoystickX, rightJoystickY)
+        _gamepadInputState.value = GamepadInputData.from(input)
     }
 
     override fun log(priority: Int, message: String) {

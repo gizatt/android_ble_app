@@ -7,11 +7,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import no.nordicsemi.android.blinky.spec.GamepadInput
 
 @Composable
 internal fun BlinkyControlView(
     t: Double,
-    setGamepadState: (Boolean, Byte, Byte, Byte, Byte) -> Unit,
+    setGamepadState: (GamepadInput) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -19,9 +20,9 @@ internal fun BlinkyControlView(
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         GamepadView(setGamepadState = setGamepadState)
-        GamepadOutputStateView(
-            t = t
-        )
+//        GamepadOutputStateView(
+//            t = t
+//        )
     }
 }
 

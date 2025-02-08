@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import no.nordicsemi.android.blinky.spec.GamepadInput
 import no.nordicsemi.android.blinky.ui.control.repository.GamepadRepository
 import no.nordicsemi.android.common.logger.LoggerLauncher
 import timber.log.Timber
@@ -59,12 +60,12 @@ class BlinkyViewModel @Inject constructor(
     /**
      * Sends a command to the device.
      */
-    fun setGamepadState(enable: Boolean, leftJoystickX: Byte, leftJoystickY: Byte, rightJoystickX: Byte, rightJoystickY: Byte) {
+    fun setGamepadState(input: GamepadInput) {
         val exceptionHandler = CoroutineExceptionHandler { _, _ -> }
         viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
             // Just like above, when this method throws an exception, it will be caught by the
             // exception handler and ignored.
-            repository.setGamepadState(enable, leftJoystickX, leftJoystickY, rightJoystickX, rightJoystickY)
+            repository.setGamepadState(input)
         }
     }
 
