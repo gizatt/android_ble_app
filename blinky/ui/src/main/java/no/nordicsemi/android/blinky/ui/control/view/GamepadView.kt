@@ -60,21 +60,21 @@ internal fun GamepadView(
     ) {
         // Toggle Button (Switch)
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().height(16.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
-            Text(text = "Enable:", fontSize = 18.sp)
+            Text(text = "Enable:")
             Spacer(modifier = Modifier.width(16.dp))
             Switch(
                 checked = isEnabled,
                 onCheckedChange = {
                     isEnabled = it
                     sendGamepadState()
-                }
+                },
             )
             Spacer(modifier = Modifier.width(16.dp))
-            Text(text = "Speed: %.02f".format(speed), fontSize= 18.sp)
+            Text(text = "Speed: %.02f".format(speed))
             Spacer(modifier = Modifier.width(4.dp))
             Slider(
                 value = speed,
@@ -86,11 +86,11 @@ internal fun GamepadView(
                 })
         }
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().height(16.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
-            Text(text = "Motion control:", fontSize = 18.sp)
+            Text(text = "Motion control:")
             Spacer(modifier = Modifier.width(16.dp))
             Switch(
                 checked = motionEnable,
@@ -100,7 +100,7 @@ internal fun GamepadView(
                 }
             )
             Spacer(modifier = Modifier.width(16.dp))
-            Text(text = "Height: %.02f".format(height), fontSize= 18.sp)
+            Text(text = "Height: %.02f".format(height))
             Spacer(modifier = Modifier.width(4.dp))
             Slider(
                 value = height,

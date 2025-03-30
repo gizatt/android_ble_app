@@ -56,11 +56,12 @@ fun ThumbJoystick(
                     },
                     onDrag = { change, _ ->
                         val radius = intArrayOf(size.width, size.height).min() / 2f
-                        val deadzone = intArrayOf(size.width, size.height).min() / 10f
+                        val deadzone = intArrayOf(size.width, size.height).min() / 20f
                         currentOffset = change.position - center
                         val distance = currentOffset.getDistance()
-                        if (distance < deadzone)
+                        if (distance < deadzone) {
                             currentOffset = Offset.Zero
+                        }
                         else if (distance > radius) {
                             currentOffset = currentOffset.times(radius / distance)
                         } else {
